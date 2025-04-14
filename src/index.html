@@ -1,35 +1,1337 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" href="./assets/img/4geeks.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello Rigo with Vanilla.js</title>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Funciones JavaScript</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- El CSS irá en la siguiente parte -->
+    <style>
+      :root {
+          --primary: #5b21b6;
+          --primary-light: #8b5cf6;
+          --secondary: #2563eb;
+          --accent: #f97316;
+          --dark: #1e293b;
+          --light: #f8fafc;
+          --success: #10b981;
+          --error: #ef4444;
+          --warning: #f59e0b;
+      }
+      
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      body {
+          background-color: var(--light);
+          color: var(--dark);
+          line-height: 1.6;
+      }
+      
+      header {
+          background: linear-gradient(135deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 2rem 0;
+          text-align: center;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+      }
+      
+      .subtitle {
+          font-size: 1.2rem;
+          opacity: 0.9;
+      }
+      
+      .container {
+          max-width: 1200px;
+          margin: 2rem auto;
+          padding: 0 2rem;
+      }
+      
+      .intro {
+          text-align: center;
+          margin-bottom: 3rem;
+      }
+      
+      .intro p {
+          max-width: 800px;
+          margin: 1rem auto;
+          font-size: 1.1rem;
+      }
+      
+      .card {
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          padding: 2rem;
+          margin-bottom: 2rem;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      
+      .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      }
+      
+      .card-title {
+          font-size: 1.5rem;
+          color: var(--primary);
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+      }
+      
+      .card-title i {
+          margin-right: 0.5rem;
+          font-size: 1.8rem;
+      }
+      .code-container {
+    background-color: var(--dark);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 1.5rem 0;
+}
 
-    <!-- Fontawesome is our recomended library for icons -->
-    <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"
-      integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
-      crossorigin="anonymous"
-    />
-  </head>
-  <body>
-    <!-- Write your HTML code here, you can delete everything withing the body tags -->
-    <div class="container-fluid text-center">
-      <h1 class="mt-5">Hello Rigo!</h1>
-      <img src="./assets/img/rigo-baby.jpg" />
-      <p class="alert alert-warning mt-4">
-        If this text is <b>not</b> centered and <b>yellow</b>, you probably have
-        an error
-      </p>
-      <div class="fixed-bottom p-4">
-        Made with ❤️ by
-        <a href="https://www.4geeksacademy.com">4Geeks Academy</a>
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2d3748;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #4a5568;
+}
+
+.code-title {
+    color: white;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.btn {
+    background-color: var(--primary-light);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: var(--primary);
+}
+
+.code {
+    padding: 1rem;
+    color: #e2e8f0;
+    font-family: 'Courier New', monospace;
+    line-height: 1.4;
+    overflow-x: auto;
+    font-size: 0.95rem;
+}
+
+.keyword { color: #bd93f9; }
+.function { color: #50fa7b; }
+.string { color: #f1fa8c; }
+.number { color: #ff79c6; }
+.comment { color: #6272a4; }
+.operator { color: #ff79c6; }
+
+.result-container {
+    background-color: #edf2f7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-left: 4px solid var(--accent);
+}
+
+.result-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+}
+
+.result {
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+}
+
+.function-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.function-type-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    border-top: 5px solid var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.function-type-card:hover {
+    transform: translateY(-5px);
+}
+
+.function-type-card h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.function-type-card:nth-child(2) {
+    border-top-color: var(--secondary);
+}
+
+.function-type-card:nth-child(2) h3 {
+    color: var(--secondary);
+}
+
+.function-type-card:nth-child(3) {
+    border-top-color: var(--accent);
+}
+
+.function-type-card:nth-child(3) h3 {
+    color: var(--accent);
+}
+
+.visual-section {
+    background-color: white;
+    padding: 3rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 3rem 0;
+    text-align: center;
+}
+
+.visual-title {
+    margin-bottom: 2rem;
+    color: var(--primary);
+}
+
+.function-machine {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    padding: 2rem 0;
+}
+
+.function-parts {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+.function-part {
+    width: 30%;
+    padding: 1.5rem;
+    border-radius: 8px;
+    color: white;
+    position: relative;
+    text-align: center;
+}
+
+.function-part h4 {
+    margin-bottom: 0.5rem;
+}
+
+.function-part p {
+    font-size: 0.9rem;
+}
+
+.input-part {
+    background-color: var(--secondary);
+}
+
+.process-part {
+    background-color: var(--primary);
+}
+
+.output-part {
+    background-color: var(--success);
+}
+
+.arrow {
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.arrow-right-1 {
+    border-left: 20px solid var(--secondary);
+    right: -20px;
+}
+
+.arrow-right-2 {
+    border-left: 20px solid var(--primary);
+    right: -20px;
+}
+
+@media (max-width: 768px) {
+    .function-parts {
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+    }
+    
+    .function-part {
+        width: 80%;
+    }
+    
+    .arrow {
+        display: none;
+    }
+    
+    .code {
+        font-size: 0.8rem;
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+.execution-step {
+    width: 100%;
+    padding: 0.8rem;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.execution-step.active {
+    background: #e9d8fd;
+    transform: scale(1.05);
+}
+
+.step-number {
+    background: var(--primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.step-description {
+    flex: 1;
+    padding: 0 1rem;
+    text-align: left;
+}
+/* Mejora de la sección de buenas prácticas */
+.best-practices {
+    background: linear-gradient(to right, #f0fff4, #d1fae5);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 3rem 2rem;
+    margin: 3rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.best-practices::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(to right, var(--success), #34d399);
+}
+
+.best-practices h2 {
+    color: #065f46;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2rem;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.best-practices h2::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: var(--success);
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.practice-list {
+    list-style: none;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.practice-item {
+    margin-bottom: 1.5rem;
+    padding: 1.2rem 1.5rem 1.2rem 3.5rem;
+    position: relative;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.practice-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.practice-item:before {
+    content: "✓";
+    color: white;
+    background-color: var(--success);
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+/* Mejora de las tarjetas de tipos de función */
+.function-type-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.function-type-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: var(--primary);
+    transition: height 0.3s ease;
+}
+
+.function-type-card:nth-child(2)::before {
+    background: var(--secondary);
+}
+
+.function-type-card:nth-child(3)::before {
+    background: var(--accent);
+}
+
+.function-type-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+.function-type-card:hover::before {
+    height: 8px;
+}
+
+.function-type-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.function-type-card h3::after {
+    content: '';
+    display: block;
+    width: 50%;
+    height: 3px;
+    background-color: var(--primary);
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    border-radius: 2px;
+}
+
+.function-type-card:nth-child(2) h3::after {
+    background-color: var(--secondary);
+}
+
+.function-type-card:nth-child(3) h3::after {
+    background-color: var(--accent);
+}
+
+/* Mejora de la cabecera */
+header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 150%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% -50%, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
+}
+
+h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.8rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Mejora de la sección visual */
+.visual-section {
+    background-color: white;
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    margin: 4rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(to right bottom, #f5f3ff, #ede9fe);
+}
+
+.visual-title {
+    margin-bottom: 2.5rem;
+    color: var(--primary);
+    font-size: 2.2rem;
+    font-weight: bold;
+    position: relative;
+    display: inline-block;
+}
+
+.visual-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: var(--primary);
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+.function-parts {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 900px;
+    gap: 2rem;
+}
+
+.function-part {
+    width: 30%;
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+    color: white;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.function-part:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+}
+
+.input-part {
+    background: linear-gradient(to bottom right, #3b82f6, #1d4ed8);
+}
+
+.process-part {
+    background: linear-gradient(to bottom right, #8b5cf6, #6d28d9);
+}
+
+.output-part {
+    background: linear-gradient(to bottom right, #10b981, #059669);
+}
+
+.function-part h4 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.function-part p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+#params-display, #process-display, #return-display {
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+/* Mejorar la animación de ejecución */
+.execution-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 2rem auto;
+    max-width: 700px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.execution-step {
+    width: 100%;
+    padding: 1.2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.4s ease;
+    border-left: 4px solid transparent;
+}
+
+.execution-step.active {
+    background: #f5f3ff;
+    transform: scale(1.05);
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.12);
+}
+
+.step-number {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 3px 6px rgba(91, 33, 182, 0.3);
+}
+
+.step-description {
+    flex: 1;
+    padding: 0 1.5rem;
+    text-align: left;
+    font-size: 1.1rem;
+}
+
+.demo-btn {
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(91, 33, 182, 0.3);
+    margin-top: 1.5rem;
+}
+
+.demo-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(91, 33, 182, 0.4);
+}
+
+/* Footer mejorado */
+footer {
+    background: linear-gradient(to right, #1e293b, #334155);
+    color: white;
+    padding: 3rem 0;
+    text-align: center;
+    margin-top: 6rem;
+    position: relative;
+    overflow: hidden;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 80% 150%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+}
+
+footer p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    position: relative;
+}
+
+/* Mejora de la sección de errores */
+.errors-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.error-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    position: relative;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.error-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 6px;
+    background: var(--error);
+}
+
+.error-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+.error-card h3 {
+    color: var(--error);
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.error-card h3 i {
+    margin-right: 0.8rem;
+    font-size: 1.6rem;
+}
+
+.error-card p {
+    margin-top: 1.2rem;
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Mejora de la demo interactiva */
+.interactive-demo {
+    margin: 4rem 0;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: linear-gradient(to right bottom, #eff6ff, #dbeafe);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.interactive-demo h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    color: var(--secondary);
+}
+
+.interactive-demo p {
+    font-size: 1.1rem;
+    color: #1e3a8a;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.demo-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2.5rem 0;
+    flex-wrap: wrap;
+}
+
+.demo-input {
+    padding: 0.8rem 1.2rem;
+    border: 2px solid var(--secondary);
+    border-radius: 6px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    min-width: 100px;
+}
+
+.demo-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(91, 33, 182, 0.2);
+    outline: none;
+}
+
+.output-display {
+    font-size: 1.4rem;
+    margin-top: 2rem;
+    padding: 1.5rem 2rem;
+    background-color: white;
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 350px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+    color: var(--dark);
+    border-left: 4px solid var(--secondary);
+}
+
+/* Animaciones mejoradas */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.demo-btn, .btn {
+    background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--primary));
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease infinite;
+}
+
+@keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(91, 33, 182, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(91, 33, 182, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(91, 33, 182, 0.5); }
+}
+
+.visual-title {
+    animation: glow 3s infinite alternate;
+}
+  </style>
+</head>
+<body>
+    <header>
+        <h1>Funciones en JavaScript</h1>
+        <p class="subtitle">Bloques de código reutilizables para organizar tu programación</p>
+    </header>
+    
+    <div class="container">
+        <div class="intro">
+            <h2>¿Qué son las funciones?</h2>
+            <p>Las funciones son bloques de código reutilizables que realizan tareas específicas. Son fundamentales para escribir código limpio, modular y mantenible.</p>
+        </div>
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-question-circle"></i> ¿Por qué usamos funciones?</h2>
+          <p>Imagina que necesitas realizar la misma operación varias veces en tu código. Sin funciones, tendrías que repetir el mismo código una y otra vez:</p>
+          
+          <div class="code-container">
+              <div class="code-header">
+                  <span class="code-title">Sin funciones</span>
+                  <button class="btn run-btn" data-code="without-functions">Ejecutar</button>
+              </div>
+              <pre class="code">
+      <span class="comment">// Calcular área de un rectángulo (base x altura)</span>
+      <span class="keyword">let</span> base1 <span class="operator">=</span> <span class="number">5</span>;
+      <span class="keyword">let</span> altura1 <span class="operator">=</span> <span class="number">3</span>;
+      <span class="keyword">let</span> area1 <span class="operator">=</span> base1 <span class="operator">*</span> altura1;
+      console.<span class="function">log</span>(<span class="string">"El área del rectángulo 1 es: "</span> <span class="operator">+</span> area1);
+      
+      <span class="comment">// Ahora calculamos otra área</span>
+      <span class="keyword">let</span> base2 <span class="operator">=</span> <span class="number">7</span>;
+      <span class="keyword">let</span> altura2 <span class="operator">=</span> <span class="number">4</span>;
+      <span class="keyword">let</span> area2 <span class="operator">=</span> base2 <span class="operator">*</span> altura2;
+      console.<span class="function">log</span>(<span class="string">"El área del rectángulo 2 es: "</span> <span class="operator">+</span> area2);
+      
+      <span class="comment">// Y otra más...</span>
+      <span class="keyword">let</span> base3 <span class="operator">=</span> <span class="number">10</span>;
+      <span class="keyword">let</span> altura3 <span class="operator">=</span> <span class="number">2</span>;
+      <span class="keyword">let</span> area3 <span class="operator">=</span> base3 <span class="operator">*</span> altura3;
+      console.<span class="function">log</span>(<span class="string">"El área del rectángulo 3 es: "</span> <span class="operator">+</span> area3);</pre>
+          </div>
+          
+          <div class="result-container" id="without-functions-result">
+              <div class="result-title">Resultado:</div>
+              <div class="result">No ejecutado aún</div>
+          </div>
+          
+          <p>Con funciones, puedes escribir el código una vez y reutilizarlo:</p>
+          
+          <div class="code-container">
+              <div class="code-header">
+                  <span class="code-title">Con funciones</span>
+                  <button class="btn run-btn" data-code="with-functions">Ejecutar</button>
+              </div>
+              <pre class="code">
+      <span class="comment">// Definimos una función para calcular el área</span>
+      <span class="keyword">function</span> <span class="function">calcularArea</span>(base, altura) {
+        <span class="keyword">return</span> base <span class="operator">*</span> altura;
+      }
+      
+      <span class="comment">// Ahora podemos usarla muchas veces</span>
+      <span class="keyword">let</span> area1 <span class="operator">=</span> <span class="function">calcularArea</span>(<span class="number">5</span>, <span class="number">3</span>);
+      console.<span class="function">log</span>(<span class="string">"El área del rectángulo 1 es: "</span> <span class="operator">+</span> area1);
+      
+      <span class="keyword">let</span> area2 <span class="operator">=</span> <span class="function">calcularArea</span>(<span class="number">7</span>, <span class="number">4</span>);
+      console.<span class="function">log</span>(<span class="string">"El área del rectángulo 2 es: "</span> <span class="operator">+</span> area2);
+      
+      <span class="keyword">let</span> area3 <span class="operator">=</span> <span class="function">calcularArea</span>(<span class="number">10</span>, <span class="number">2</span>);
+      console.<span class="function">log</span>(<span class="string">"El área del rectángulo 3 es: "</span> <span class="operator">+</span> area3);</pre>
+          </div>
+          
+          <div class="result-container" id="with-functions-result">
+              <div class="result-title">Resultado:</div>
+              <div class="result">No ejecutado aún</div>
+          </div>
       </div>
+        
+      <div class="function-visual-guide">
+        <div class="visual-guide-item">
+            <div class="visual-guide-icon">
+                <i class="fas fa-recycle"></i>
+            </div>
+            <h3>Reutilización</h3>
+            <p>Escribe el código una vez, úsalo muchas veces. Evita repetir las mismas líneas una y otra vez.</p>
+        </div>
+        
+        <div class="visual-guide-item">
+            <div class="visual-guide-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <h3>Organización</h3>
+            <p>Divide tu código en bloques lógicos que realizan tareas específicas, haciendo que sea más fácil de entender.</p>
+        </div>
+        
+        <div class="visual-guide-item">
+            <div class="visual-guide-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <h3>Mantenimiento</h3>
+            <p>Cuando necesites cambiar algo, solo debes modificar la función una vez, no cada lugar donde se usa.</p>
+        </div>
+        
+        <div class="visual-guide-item">
+            <div class="visual-guide-icon">
+                <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <h3>Modularidad</h3>
+            <p>Divide problemas grandes en partes más pequeñas y manejables, haciendo que el desarrollo sea más sencillo.</p>
+        </div>
     </div>
+    
+    <h2 style="text-align: center; margin: 3rem 0 2rem;">Tipos de Funciones en JavaScript</h2>
+    
+    <div class="function-types">
+        <div class="function-type-card">
+            <h3>Declaración de Función</h3>
+            <div class="code-container" style="margin-top: 1rem;">
+                <pre class="code">
+    <span class="keyword">function</span> <span class="function">saludar</span>(nombre) {
+      <span class="keyword">return</span> <span class="string">"Hola "</span> <span class="operator">+</span> nombre;
+    }
+    
+    <span class="comment">// Uso</span>
+    <span class="function">saludar</span>(<span class="string">"Ana"</span>);  <span class="comment">// "Hola Ana"</span></pre>
+            </div>
+            <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <li>Se declaran con la palabra clave <code>function</code></li>
+                <li>Se pueden llamar antes de ser declaradas</li>
+                <li>Fácil de identificar en el código</li>
+            </ul>
+        </div>
+        
+        <div class="function-type-card">
+            <h3>Expresión de Función</h3>
+            <div class="code-container" style="margin-top: 1rem;">
+                <pre class="code">
+    <span class="keyword">const</span> sumar <span class="operator">=</span> <span class="keyword">function</span>(a, b) {
+      <span class="keyword">return</span> a <span class="operator">+</span> b;
+    };
+    
+    <span class="comment">// Uso</span>
+    sumar(<span class="number">5</span>, <span class="number">3</span>);  <span class="comment">// 8</span></pre>
+            </div>
+            <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <li>La función se asigna a una variable</li>
+                <li>No se pueden usar antes de ser declaradas</li>
+                <li>Útil para asignar funciones a eventos o propiedades</li>
+            </ul>
+        </div>
+        
+        <div class="function-type-card">
+            <h3>Función Flecha</h3>
+            <div class="code-container" style="margin-top: 1rem;">
+                <pre class="code">
+    <span class="keyword">const</span> multiplicar <span class="operator">=</span> (a, b) <span class="operator">=></span> a <span class="operator">*</span> b;
+    
+    <span class="comment">// Uso</span>
+    multiplicar(<span class="number">4</span>, <span class="number">2</span>);  <span class="comment">// 8</span>
+    
+    <span class="comment">// Con múltiples líneas</span>
+    <span class="keyword">const</span> dividir <span class="operator">=</span> (a, b) <span class="operator">=></span> {
+      <span class="keyword">if</span> (b <span class="operator">===</span> <span class="number">0</span>) {
+        <span class="keyword">return</span> <span class="string">"Error: División por cero"</span>;
+      }
+      <span class="keyword">return</span> a <span class="operator">/</span> b;
+    };</pre>
+            </div>
+            <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                <li>Sintaxis más corta y moderna (ES6)</li>
+                <li>No tienen su propio <code>this</code></li>
+                <li>Return implícito en funciones de una sola expresión</li>
+            </ul>
+        </div>
+    </div>
+    </div>
+    <div class="visual-section">
+      <h2 class="visual-title">Cómo Funcionan las Funciones</h2>
+      
+      <div class="function-machine">
+          <div class="function-parts">
+              <div class="function-part input-part">
+                  <h4>ENTRADA</h4>
+                  <p>Parámetros que recibe la función</p>
+                  <div id="params-display">(5, 3)</div>
+                  <span class="arrow arrow-right-1"></span>
+              </div>
+              
+              <div class="function-part process-part">
+                  <h4>PROCESO</h4>
+                  <p>El código que se ejecuta</p>
+                  <div id="process-display">return base * altura;</div>
+                  <span class="arrow arrow-right-2"></span>
+              </div>
+              
+              <div class="function-part output-part">
+                  <h4>SALIDA</h4>
+                  <p>El valor que devuelve</p>
+                  <div id="return-display">15</div>
+              </div>
+          </div>
+      </div>
+      
+      <div class="execution-animation">
+          <h3>Ejecución paso a paso:</h3>
+          <div class="execution-container">
+              <div class="execution-step" id="step1">
+                  <div class="step-number">1</div>
+                  <div class="step-description">La función <code>calcularArea</code> recibe <code>5</code> y <code>3</code> como parámetros</div>
+              </div>
+              <div class="execution-step" id="step2">
+                  <div class="step-number">2</div>
+                  <div class="step-description">Dentro de la función, <code>base</code> vale <code>5</code> y <code>altura</code> vale <code>3</code></div>
+              </div>
+              <div class="execution-step" id="step3">
+                  <div class="step-number">3</div>
+                  <div class="step-description">Se ejecuta la operación: <code>5 * 3 = 15</code></div>
+              </div>
+              <div class="execution-step" id="step4">
+                  <div class="step-number">4</div>
+                  <div class="step-description">La función <code>return</code> devuelve el valor <code>15</code></div>
+              </div>
+              <div class="execution-step" id="step5">
+                  <div class="step-number">5</div>
+                  <div class="step-description">La variable <code>area1</code> recibe el valor <code>15</code></div>
+              </div>
+          </div>
+          <button class="btn demo-btn" id="animate-btn">Ver animación</button>
+      </div>
+  </div>
+  <div class="interactive-demo">
+    <h2>Demo Interactivo: Calculadora de Funciones</h2>
+    <p>Prueba las distintas maneras de definir funciones con esta calculadora interactiva. Cada operación utiliza un tipo diferente de función.</p>
+    
+    <div class="code-container">
+        <div class="code-header">
+            <span class="code-title">Funciones de la calculadora</span>
+        </div>
+        <pre class="code">
+<span class="comment">// Declaración de función</span>
+<span class="keyword">function</span> <span class="function">sumar</span>(a, b) {
+  <span class="keyword">return</span> a <span class="operator">+</span> b;
+}
 
-    <!-- Do not delete this script tag, this is what connects your HTML with the Javascript code -->
-    <script type="module" src="/app.js"></script>
-  </body>
+<span class="comment">// Expresión de función</span>
+<span class="keyword">const</span> restar <span class="operator">=</span> <span class="keyword">function</span>(a, b) {
+  <span class="keyword">return</span> a <span class="operator">-</span> b;
+};
+
+<span class="comment">// Función flecha</span>
+<span class="keyword">const</span> multiplicar <span class="operator">=</span> (a, b) <span class="operator">=></span> a <span class="operator">*</span> b;
+
+<span class="comment">// Función flecha con múltiples líneas</span>
+<span class="keyword">const</span> dividir <span class="operator">=</span> (a, b) <span class="operator">=></span> {
+  <span class="keyword">if</span> (b <span class="operator">===</span> <span class="number">0</span>) {
+    <span class="keyword">return</span> <span class="string">"Error: División por cero"</span>;
+  }
+  <span class="keyword">return</span> a <span class="operator">/</span> b;
+};</pre>
+    </div>
+    
+    <div class="demo-controls">
+        <input type="number" id="num1" class="demo-input" placeholder="Número 1" value="10">
+        <select id="operation" class="demo-input">
+            <option value="sumar">Sumar (+) - Declaración</option>
+            <option value="restar">Restar (-) - Expresión</option>
+            <option value="multiplicar">Multiplicar (*) - Flecha</option>
+            <option value="dividir">Dividir (/) - Flecha con condición</option>
+        </select>
+        <input type="number" id="num2" class="demo-input" placeholder="Número 2" value="2">
+        <button id="calculate-btn" class="demo-btn">Calcular</button>
+    </div>
+    
+    <div class="output-display" id="calc-result">Resultado: ?</div>
+    <p style="margin-top: 20px; font-style: italic; color: #6b7280;">Prueba a dividir por 0 para ver el manejo de errores</p>
+</div>
+<h2 style="text-align: center; margin: 3rem 0 2rem;">Errores Comunes con Funciones</h2>
+
+<div class="errors-container">
+    <div class="error-card">
+        <h3><i class="fas fa-exclamation-triangle"></i> Olvidar el return</h3>
+        <div class="code-container">
+            <pre class="code">
+<span class="comment">// ❌ Error: No retorna nada</span>
+<span class="keyword">function</span> <span class="function">sumar</span>(a, b) {
+  a <span class="operator">+</span> b;  <span class="comment">// Falta return</span>
+}
+
+<span class="comment">// ✅ Correcto: Con return</span>
+<span class="keyword">function</span> <span class="function">sumar</span>(a, b) {
+  <span class="keyword">return</span> a <span class="operator">+</span> b;
+}</pre>
+        </div>
+        <p>Sin el <code>return</code>, la función calcula la suma pero no devuelve ningún valor, por lo que siempre obtendrás <code>undefined</code>.</p>
+    </div>
+    
+    <div class="error-card">
+        <h3><i class="fas fa-exclamation-triangle"></i> Problemas con this</h3>
+        <div class="code-container">
+            <pre class="code">
+<span class="comment">// ❌ Error: 'this' en función flecha</span>
+<span class="keyword">const</span> persona <span class="operator">=</span> {
+  nombre: <span class="string">"Juan"</span>,
+  saludar: () <span class="operator">=></span> {
+    console.<span class="function">log</span>(<span class="string">"Hola, soy "</span> <span class="operator">+</span> <span class="keyword">this</span>.nombre);
+  }
+};
+
+<span class="comment">// ✅ Correcto: Función normal</span>
+<span class="keyword">const</span> persona <span class="operator">=</span> {
+  nombre: <span class="string">"Juan"</span>,
+  saludar: <span class="keyword">function</span>() {
+    console.<span class="function">log</span>(<span class="string">"Hola, soy "</span> <span class="operator">+</span> <span class="keyword">this</span>.nombre);
+  }
+};</pre>
+        </div>
+        <p>Las funciones flecha no tienen su propio <code>this</code>, heredan el <code>this</code> del contexto donde se definen.</p>
+    </div>
+</div>
+<div class="best-practices">
+  <h2>Buenas Prácticas</h2>
+  <ul class="practice-list">
+      <li class="practice-item">Usa nombres descriptivos que indiquen lo que hace la función (ej. <code>calcularTotal()</code> en lugar de <code>calc()</code>)</li>
+      <li class="practice-item">Cada función debe hacer una sola cosa (principio de responsabilidad única)</li>
+      <li class="practice-item">Valida los parámetros de entrada para evitar errores inesperados</li>
+      <li class="practice-item">Documenta funciones complejas para facilitar su comprensión</li>
+      <li class="practice-item">Mantén las funciones pequeñas y enfocadas (si es muy larga, divídela)</li>
+  </ul>
+</div>
+
+<footer>
+  <p>Visualizador de Funciones JavaScript - Creado para fines educativos</p>
+</footer>
+
+<script>
+  // Código para los ejemplos "sin funciones" y "con funciones"
+  const runButtons = document.querySelectorAll('.run-btn');
+  runButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          const codeType = this.getAttribute('data-code');
+          const resultContainer = document.getElementById(`${codeType}-result`);
+          const resultElement = resultContainer.querySelector('.result');
+          
+          let output = '';
+          
+          if (codeType === 'without-functions') {
+              // Calcular área de un rectángulo (base x altura)
+              let base1 = 5;
+              let altura1 = 3;
+              let area1 = base1 * altura1;
+              output += "El área del rectángulo 1 es: " + area1 + "\n";
+              
+              // Ahora calculamos otra área
+              let base2 = 7;
+              let altura2 = 4;
+              let area2 = base2 * altura2;
+              output += "El área del rectángulo 2 es: " + area2 + "\n";
+              
+              // Y otra más...
+              let base3 = 10;
+              let altura3 = 2;
+              let area3 = base3 * altura3;
+              output += "El área del rectángulo 3 es: " + area3;
+          } else if (codeType === 'with-functions') {
+              // Definimos una función para calcular el área
+              function calcularArea(base, altura) {
+                  return base * altura;
+              }
+              
+              // Ahora podemos usarla muchas veces
+              let area1 = calcularArea(5, 3);
+              output += "El área del rectángulo 1 es: " + area1 + "\n";
+              
+              let area2 = calcularArea(7, 4);
+              output += "El área del rectángulo 2 es: " + area2 + "\n";
+              
+              let area3 = calcularArea(10, 2);
+              output += "El área del rectángulo 3 es: " + area3;
+          }
+          
+          resultElement.textContent = output;
+      });
+  });
+  
+  // Código para la calculadora interactiva
+  document.getElementById('calculate-btn').addEventListener('click', function() {
+      const num1 = parseFloat(document.getElementById('num1').value);
+      const num2 = parseFloat(document.getElementById('num2').value);
+      const operation = document.getElementById('operation').value;
+      const resultDisplay = document.getElementById('calc-result');
+      
+      // Declaración de función
+      function sumar(a, b) {
+          return a + b;
+      }
+      
+      // Expresión de función
+      const restar = function(a, b) {
+          return a - b;
+      };
+      
+      // Función flecha
+      const multiplicar = (a, b) => a * b;
+      
+      // Función flecha con múltiples líneas
+      const dividir = (a, b) => {
+          if (b === 0) {
+              return "Error: División por cero";
+          }
+          return a / b;
+      };
+      
+      let result;
+      
+      switch(operation) {
+          case 'sumar':
+              result = sumar(num1, num2);
+              break;
+          case 'restar':
+              result = restar(num1, num2);
+              break;
+          case 'multiplicar':
+              result = multiplicar(num1, num2);
+              break;
+          case 'dividir':
+              result = dividir(num1, num2);
+              break;
+          default:
+              result = "Operación no válida";
+      }
+      
+      resultDisplay.textContent = `Resultado: ${result}`;
+  });
+  
+  // Animación de los pasos de ejecución
+  document.getElementById('animate-btn').addEventListener('click', function() {
+      const steps = document.querySelectorAll('.execution-step');
+      let currentStep = 0;
+      
+      // Primero, quita todas las clases active
+      steps.forEach(step => step.classList.remove('active'));
+      
+      // Función para animar los pasos uno a uno
+      function animateNextStep() {
+          if (currentStep < steps.length) {
+              if (currentStep > 0) {
+                  steps[currentStep - 1].classList.remove('active');
+              }
+              steps[currentStep].classList.add('active');
+              currentStep++;
+              setTimeout(animateNextStep, 1000);
+          }
+      }
+      
+      // Inicia la animación
+      animateNextStep();
+  });
+</script>
+    
+    <!-- Los scripts irán en la última parte -->
+</body>
 </html>
